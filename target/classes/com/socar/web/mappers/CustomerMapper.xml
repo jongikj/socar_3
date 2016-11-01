@@ -1,0 +1,72 @@
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.socar.web.mappers.CustomerMapper">
+	<select id="count" resultType="com.socar.web.domains.Retval">
+		select count(*) as count 
+	   from   notice
+	</select>
+	<select id="list" resultType="com.socar.web.domains.CustomerDTO"
+	parameterType="com.socar.web.domains.Command">
+	  select t2.*
+	  from (select @ROWNUM := @ROWNUM + 1 AS seq
+	              ,n.title
+	              ,n.content
+	              ,DATE_FORMAT(n.regDate, '%Y-%m-%d') regDate
+	              ,n.customerSeq
+  		    from   notice n
+		          ,(SELECT @ROWNUM := 0) R
+		    ORDER BY n.customerSeq DESC
+	       ) t2
+	  where t2.seq between #{start} and #{end}
+	  order by t2.seq asc
+	</select>
+	<select id="faqList" resultType="com.socar.web.domains.CustomerDTO" parameterType="com.socar.web.domains.Command">
+		select 
+			title title,
+			content content,
+			category category,
+			customer_seq customerSeq
+		from customer where ${keyField} = #{keyword}
+	</select>
+	 <select id="find_count" resultType="com.socar.web.domains.Retval" parameterType="com.socar.web.domains.Command">
+   		select count(*) as count 
+   	from   (select  n.title
+   	               ,n.content
+   	               ,DATE_FORMAT(n.regDate, '%Y-%m-%d') regDate
+   	               ,n.customerSeq
+   	 	    from    notice n
+   	 	    WHERE   ${keyField} like CONCAT('%',#{keyword},'%')
+   	       ) t
+   </select>
+   <select id="faqCount" resultType="com.socar.web.domains.Retval" parameterType="com.socar.web.domains.Command">
+   		select count(*) as count from member_customer where ${keyField} = #{keyword}
+   </select>
+	<select id="find" resultType="com.socar.web.domains.CustomerDTO" parameterType="com.socar.web.domains.Command">
+      select t2.*
+	  from (select @ROWNUM := @ROWNUM + 1 AS seq
+	              ,n.title
+	              ,n.content
+	              ,DATE_FORMAT(regDate, '%Y-%m-%d') regDate
+	              ,n.customerSeq  
+	        from   notice n
+	              ,(SELECT @ROWNUM := 0) R
+	        WHERE  ${keyField} like CONCAT('%',#{keyword},'%')
+	       ) t2
+	   where t2.seq between #{start} and #{end}   
+	   order by t2.seq asc	  
+   </select>
+   <select id="goArticle" resultType="com.socar.web.domains.CustomerDTO" parameterType="com.socar.web.domains.Command">
+		select 
+			customer_seq customerSeq,
+			title title,
+			content content,
+			file_name fileName,
+			reg_date regDate
+		from Customer where ${keyField} = #{keyword}
+   </select>
+   <select id="inquiry_form" resultType="com.socar.web.domains.Retval" parameterType="com.socar.web.domains.CustomerDTO">
+        insert into customer(id,title,content,category,file_name,reg_date,role)
+        values(#{id},#{title},#{content},#{category},#{fileName},#{regDate},'CUSTOMER')
+   </select>
+</mapper>
