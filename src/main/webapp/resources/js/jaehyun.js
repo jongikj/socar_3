@@ -6,62 +6,10 @@ var member = (function(){
 	
 	var onCreate = function(){
 		setContentView();
-		member.mypage();
 		$('#login_cancel_btn').click(function() {controller.home();});
 		$('#header_regist_btn, #content_regist_btn').click(function(){member.regist();});
 		$('#header_login_btn').click(function() {member.pub_signin();});
-		
-		$("#info_nav > li:nth-child(1)").click(function(){
-			$.ajax({
-				url:app.context()+"/member/myPage",
-				type:'GET',
-				data:{},
-				dataType:'JSON',
-				success:function(data){
-					$('#pub_article').html(MYINFO_FORM);
-					member.init();
-				}
-			 });
-		});
-		 
-		$("#info_nav > li:nth-child(2)").click(function(){
-			$.ajax({
-				url:app.context()+"/member/myHistory",
-				type:'GET',
-				data:{},
-				dataType:'JSON',
-				success:function(data){
-					$('#pub_article').html(MYHISTORY_FORM);
-					member.init();
-				}
-			});
-		});
-		 
-		$("#info_nav > li:nth-child(3)").click(function() {
-			$.ajax({
-				url : app.context() + '/member/myCoupon',
-				type : 'GET',
-				data : {},
-				dataType : 'JSON',
-				success : function(data){
-					$('#pub_article').html(MYCOUPON_FORM);
-					member.init();
-				}
-			});
-		});	
-
-		 $("#info_nav > li:nth-child(4)").click(function(){
-			 $.ajax({
-				 url:app.context()+"/member/myPay",
-				 type:'GET',
-				 data:{},
-				 dataType:'JSON',
-				 success:function(data){
-					 $('#pub_article').html(MYPAY_FORM);
-					 member.init();
-				 }
-			 })
-		 });		
+		$(".gnb li:nth-child(5)").click(function(){member.mypage();});
 	};
 	
 	return{
@@ -110,14 +58,13 @@ var member = (function(){
 			});
 		},
 		mypage : function(){
-			$(".gnb li:nth-child(5)").click(function(){
 				$.getJSON(app.context() + '/member/session', function(data){
 					if(data.id == null){
 						alert("로그인을 해주세요");
 					} else {
 						$('#pub_article').html(MYINFO_FORM);
 						$('#mypage_name').text(data.name);
-						$('#mypage_email').text(data.email);
+						$('#mypage_email').val(data.email);
 						$('#mypage_pw').val(data.pw);
 						$('#mypage_phone').val(data.phone);
 						$('#mypage_addr').val(data.address);
@@ -144,6 +91,50 @@ var member = (function(){
 						} else {
 							$('#mypage_type3').attr("checked", "checked");
 						}*/
+					$('#btn_update_basic').click(function() {
+						alert('update - 444');
+						var up_email = $('#mypage_email').val();
+						var up_pw = $('#mypage_pw').val();
+						var up_phone = $('#mypage_phone').val();
+						var up_address = $('#mypage_addr').val();
+						var up_licenseEnd = $('#mypage_lic_end').val();
+						var up_licenseStart = $('#mypage_lic_start').val();
+						var up_licenseNum =   $('select[name="lic_region"] option:selected').val()+'-'+$('#mypage_lic_num').val();
+						var up_licenseType = $('input:radio[name=myinfo_licenseType]:checked').val();
+					/*	alert("업데이트버튼진입1");
+						alert("up_pw"+up_pw);
+						alert("up_email"+up_email);
+						alert("up_phone"+up_phone);
+						alert("up_address"+up_address);
+						alert("up_licenseEnd"+up_licenseEnd);
+						alert("up_licenseStart"+up_licenseStart);
+						alert("면허종류 "+up_licenseType);*/
+						alert("up_licenseNum"+up_licenseNum);
+						var update_info = {
+								email : up_email,
+								pw : up_pw,
+								phone : up_phone,
+								address : up_address,
+								licenseEnd :up_licenseEnd,
+								licenseStart : up_licenseStart,
+								licenseType : up_licenseType,
+								licenseNum : up_licenseNum,
+						};
+						$.ajax({
+							url : app.context()+'/member/update',
+							type : 'post',
+							contentType : 'application/json',
+							data : JSON.stringify(update_info),
+							dataType : 'json',
+							success : function(data){
+							alert("update 성공")
+							},
+							error : function(xhr,status,msg){
+								alert('회원가입 시 에러발생'+msg); 
+							}
+						});
+						
+					});
 					
 					
 					}
@@ -151,6 +142,10 @@ var member = (function(){
 						if(cardData.cardNum == null){
 							$('#mypage_card_num').text("카드를 등록해주세요.");
 							$('#mypage_card_change').text("등록하기");
+							
+							
+							
+							
 						} else {
 							$('#mypage_card_num').text(cardData.cardNum);
 						}
@@ -167,7 +162,6 @@ var member = (function(){
 					   } 
 					});	// 마이페이지 카드폼 개인, 법인 변경 끝
 				});
-			});
 		},	//mypage 끝
 		regist : function(){
 			var temp = 0;
@@ -379,25 +373,19 @@ var member = (function(){
 								});
 								
 							});*/
-					
-					
-						
-						
-					
-						
-						
-					
 					}
-				
-				
 				}
 			});
-			
-			
-			
 		},	//regist의 끝
-		
-	
+		history : function(){
+			$('#pub_article').html(MYHISTORY_FORM);
+		},
+		my_coupon: function(){
+			$('#pub_article').html(MYCOUPON_FORM);
+		},
+		my_pay : function(){
+			$('#pub_article').html(MYPAY_FORM);
+		}
 	};	
 })();
 
@@ -443,10 +431,10 @@ var MYINFO_FORM =
 +'<div class="info_lnb">'
 +'<!-- lnb -->'
 +'<ul id="info_nav" class="info_lnb">'
-+'<li><a title="내 정보" class="info_lnb1">내 정보</a></li>'
-+'<li><a title="예약내역" class="info_lnb3">예약내역 <span>0</span></a></li>'
-+'<li><a title="내 쿠폰" class="info_lnb4">내 쿠폰 <span>2</span></a></li>'
-+'<li><a title="결제내역" class="info_lnb5">결제내역</a></li>'
++'<li><a onclick="member.mypage()" title="내 정보" class="info_lnb1">내 정보</a></li>'
++'<li><a onclick="member.history()" title="예약내역" class="info_lnb3">예약내역 <span>0</span></a></li>'
++'<li><a onclick="member.my_coupon()" title="내 쿠폰" class="info_lnb4">내 쿠폰 <span>2</span></a></li>'
++'<li><a onclick="member.my_pay()" title="결제내역" class="info_lnb5">결제내역</a></li>'
 +'</ul>'
 +'<!-- //lnb -->'
 +'<div class="section wrap_join_bn">'
@@ -463,7 +451,7 @@ var MYINFO_FORM =
 +'<td id="mypage_name"></td>'
 +'</tr><tr>'
 +'<th><img src="resources/img/mypage/index_txt2.gif" alt="이메일" /></th>'
-+'<td id="mypage_email"></td>'
++'<td><input  id="mypage_email" type="text" class="input" style="width:200px; margin-bottom: 5px"/></td>'
 +'</tr><tr><th>'
 +'<img src="resources/img/member/join_step2_txt6.gif" alt="비밀번호" /></th><td>'
 +'<input id="mypage_pw" type="password" class="input" style="width:115px"/>'
@@ -492,13 +480,13 @@ var MYINFO_FORM =
 +'<th><img src="resources/img/mypage/index_txt4.gif" alt="면허종류" /></th>'
 +'<td>'
 +'<label for="type1">'
-+'<input type="radio" id="mypage_type1" name="myinfo_licenseType" /> 1종 보통'
++'<input type="radio" id="mypage_type1" name="myinfo_licenseType" value="1종보통"/> 1종 보통'
 +'</label>'
 +'<label for="type2">'
-+'<input type="radio" id="mypage_type2" name="myinfo_licenseType" /> 2종 보통'
++'<input type="radio" id="mypage_type2" name="myinfo_licenseType" value="2종보통"/> 2종 보통'
 +'</label>'
 +'<label for="type3">'
-+'<input type="radio" id="mypage_type3" name="myinfo_licenseType" /> 1종 대형'
++'<input type="radio" id="mypage_type3" name="myinfo_licenseType" value="1종대형"/> 1종 대형'
 +'</label>'
 +'</td>'
 +'</tr>'
@@ -699,10 +687,10 @@ var MYHISTORY_FORM =
 +'<div class="info_lnb">'
 +'<!-- lnb -->'
 +'<ul id="info_nav" class="info_lnb">'
-+'<li><a title="내 정보" class="info_lnb1">내 정보</a></li>'
-+'<li><a title="예약내역" class="info_lnb3">예약내역 <span>0</span></a></li>'
-+'<li><a title="내 쿠폰" class="info_lnb4">내 쿠폰 <span>2</span></a></li>'
-+'<li><a title="결제내역" class="info_lnb5">결제내역</a></li>'
++'<li><a onclick="member.mypage()" title="내 정보" class="info_lnb1">내 정보</a></li>'
++'<li><a onclick="member.history()" title="예약내역" class="info_lnb3">예약내역 <span>0</span></a></li>'
++'<li><a onclick="member.my_coupon()" title="내 쿠폰" class="info_lnb4">내 쿠폰 <span>2</span></a></li>'
++'<li><a onclick="member.my_pay()" title="결제내역" class="info_lnb5">결제내역</a></li>'
 +'</ul>'
 +'<div class="section" style="float: left">'
 +'<div class="group" style="width: 743px">'
@@ -731,10 +719,10 @@ var MYCOUPON_FORM =
 +'<div class="info_lnb">'
 +'<!-- lnb -->'
 +'<ul id="info_nav" class="info_lnb">'
-+'<li><a title="내 정보" class="info_lnb1">내 정보</a></li>'
-+'<li><a title="예약내역" class="info_lnb3">예약내역 <span>0</span></a></li>'
-+'<li><a title="내 쿠폰" class="info_lnb4">내 쿠폰 <span>2</span></a></li>'
-+'<li><a title="결제내역" class="info_lnb5">결제내역</a></li>'
++'<li><a onclick="member.mypage()" title="내 정보" class="info_lnb1">내 정보</a></li>'
++'<li><a onclick="member.history()" title="예약내역" class="info_lnb3">예약내역 <span>0</span></a></li>'
++'<li><a onclick="member.my_coupon()" title="내 쿠폰" class="info_lnb4">내 쿠폰 <span>2</span></a></li>'
++'<li><a onclick="member.my_pay()" title="결제내역" class="info_lnb5">결제내역</a></li>'
 +'</ul>'
 +'<!-- //lnb -->'
 +'<div class="my_coupon_section">'
@@ -807,10 +795,10 @@ var MYPAY_FORM =
 +'<div class="info_lnb">'
 +'<!-- lnb -->'
 +'<ul style="margin-bottom: 0px" id="info_nav" class="info_lnb">'
-+'<li><a title="내 정보" class="info_lnb1">내 정보</a></li>'
-+'<li><a title="예약내역" class="info_lnb3">예약내역 <span>0</span></a></li>'
-+'<li><a title="내 쿠폰" class="info_lnb4">내 쿠폰 <span>2</span></a></li>'
-+'<li><a title="결제내역" class="info_lnb5">결제내역</a></li>'
++'<li><a onclick="member.mypage()" title="내 정보" class="info_lnb1">내 정보</a></li>'
++'<li><a onclick="member.history()" title="예약내역" class="info_lnb3">예약내역 <span>0</span></a></li>'
++'<li><a onclick="member.my_coupon()" title="내 쿠폰" class="info_lnb4">내 쿠폰 <span>2</span></a></li>'
++'<li><a onclick="member.my_pay()" title="결제내역" class="info_lnb5">결제내역</a></li>'
 +'</ul>'
 +'<!-- //lnb -->'
 +'<div style="margin-left: 85px" class="section">'

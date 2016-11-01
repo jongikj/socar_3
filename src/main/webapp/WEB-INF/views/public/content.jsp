@@ -65,27 +65,7 @@
 			</li>
 		</ul>
 		<div class="notice1" style="display:block;">
-			<ul style="list-style: none;">
-				<li>
-					<a href="#">[담배와의 전쟁]쏘파라치...</a>
-					<img src="http://socdnw.speedgabia.com/template/asset/images/main/ico_new.png" alt="새글">
-				</li>
-				<li>
-					<a href="#">[공지]태풍차바로인한..</a>
-					<img src="http://socdnw.speedgabia.com/template/asset/images/main/ico_new.png" alt="새글">
-				</li>
-				<li>
-					<a href="#">[쏘카존]10월2주차..</a>
-					<img src="http://socdnw.speedgabia.com/template/asset/images/main/ico_new.png" alt="새글">
-				</li>
-				<li>
-					<a href="#">[이벤트]친구도나도 2만원</a>
-					<img src="http://socdnw.speedgabia.com/template/asset/images/main/ico_new.png" alt="새글">
-				</li>
-				<li>
-					<a href="#">[공지]친구초대 쿠폰지급..</a>
-					<img src="http://socdnw.speedgabia.com/template/asset/images/main/ico_new.png" alt="새글">
-				</li>
+			<ul id="notice1" style="list-style: none;">
 			</ul>
 			<a href="#" class="more">
 				<img alt="더보기" src="resources/img/btn_more.png">
@@ -112,3 +92,19 @@
 			</div>
 		</div>
 </div>
+<script>
+var temp = '';
+$.getJSON('/web/customer/home_list/1', function(data){
+	$.each(data.list, function(i, notice){
+		if(notice.title.length > 19){
+			notice.title = notice.title.substring(0, 18) + '...';
+		}
+		temp +=
+			 '<li style="white-space: nowrap; overflow: hidden;">'
+			+'<a onclick="customer.customer_notice_content('+notice.customerSeq+', 1)">'+notice.title+'</a>'
+			+'<img src="'+app.img()+'/ico_new.png">'
+			+'</li>';
+		});
+	$('#notice1').html(temp);
+});
+</script>

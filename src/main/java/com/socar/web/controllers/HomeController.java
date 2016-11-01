@@ -1,41 +1,38 @@
 package com.socar.web.controllers;
 
-import java.text.DateFormat;
-import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Lazy;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.SessionAttributes;
 
-import lombok.Getter;
+import com.socar.web.domains.Command;
+import com.socar.web.domains.CustomerDTO;
+import com.socar.web.services.CustomerServiceImpl;
 
 /**
  * Handles requests for the application home page.
  */
 @Controller
-@Lazy
+@SessionAttributes({"notice"})
 public class HomeController {
 	private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
+	@Autowired Command command;
+	@Autowired CustomerDTO customer;
+	@Autowired CustomerServiceImpl service;
 	
-	/**
-	 * Simply selects the home view to render by returning its name.
-	 */
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public String home(Locale locale, Model model) {
 		logger.info("Welcome home! The client locale is {}.", locale);
-		
-		Date date = new Date();
-		DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG, locale);
-		
-		String formattedDate = dateFormat.format(date);
-		
-		model.addAttribute("serverTime", formattedDate);
-		
+		command.setKeyField("list");
+		command.setKeyword("1");
+		model.addAttribute("notice", service.list(command));
 		return "public:public/content.tiles";
-	}  
+	}
 }

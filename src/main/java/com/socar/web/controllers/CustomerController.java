@@ -61,6 +61,16 @@ public class CustomerController {
 	      return map;
 	}
 	
+	@RequestMapping("/home_list/{pgNum}")
+	public @ResponseBody HashMap<String, Object> homeList(@PathVariable String pgNum){
+		logger.info("CustomerController {}", "list");
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		command.setStart(1);
+		command.setEnd(5);
+		map.put("list", service.list(command));
+		return map;
+	}
+	
 	@RequestMapping("/faqList/{keyField}/{keyword}")
 	   public @ResponseBody HashMap<String, Object> faqList(@PathVariable String keyField, @PathVariable String keyword){
 	      logger.info("CustomerController {}", "faqList");

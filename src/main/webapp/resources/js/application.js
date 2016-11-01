@@ -10,7 +10,9 @@ var app = (function(){
 	
 	var onCreate = function() {
 		setContentView();
-		$('#header_logo').click(function(){controller.home();});
+		$('#header_logo').click(function(){
+			controller.home();
+		});
 	};
 	
 	var setContentView = function(){
