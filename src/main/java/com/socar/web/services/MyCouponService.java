@@ -16,7 +16,7 @@ public interface MyCouponService {
 	// SELECT
 	public Retval count();
 	public Retval findCount(Command command);
-	public List<MyCouponDTO> list(Command command);
+	public List<CouponMemberMasterDTO> list(Command command);
 	public List<MyCouponDTO> find(Command command);
 	public List<CouponMemberMasterDTO> notUsedList(Command command);
 	public Retval useFlag(Command command);

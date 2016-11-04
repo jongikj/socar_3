@@ -521,7 +521,6 @@ var booking = (function() {
 										});
 									}
 								});
-								// 이곳
 								$('#btn_reserve_complete').click(function() {
 									var split = $('#selbox_coupon').val().split(',');
 									var car_name = data.carType;

@@ -12,5 +12,5 @@ import lombok.Setter;
 @Data
 public class CouponMemberMasterDTO {
 	@Getter @Setter int couponMemberSeq, couponMasterSeq, dc, carSeq, price;
-	@Getter @Setter String useFlag, id, couponName, dcOption, startDate, endDate; 
+	@Getter @Setter String useFlag, id, couponName, dcOption, startDate, endDate, optionHeader, optionDetail, openDateStart, openDateEnd; 
 }

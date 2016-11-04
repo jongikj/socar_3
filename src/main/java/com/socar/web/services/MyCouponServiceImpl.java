@@ -33,7 +33,7 @@ public class MyCouponServiceImpl implements MyCouponService{
 	}
 	
 	@Override
-	public List<MyCouponDTO> list(Command command) {
+	public List<CouponMemberMasterDTO> list(Command command) {
 		MyCouponMapper mapper = sqlSession.getMapper(MyCouponMapper.class);
 		return mapper.list(command);
 	}

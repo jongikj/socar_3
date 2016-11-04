@@ -715,6 +715,7 @@ var customer = (function(){
 				frame += pagination;
 				notice_list += CUSTOMER_NOTICE_END;
 				$('#pub_article').html(frame);
+				
 				$('#btn_notice_search').click(function() {
 					if ($('#notice_keyword').val().length>0) {
 						customer.customer_find_notice('title',$('#notice_keyword').val(),1);

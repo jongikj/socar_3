@@ -100,6 +100,7 @@ public class PaymentController {
 		payment.setPaymentAmt(param.getPaymentAmt());
 		payment.setRentSeq(param.getRentSeq());
 		payment.setCardNum(param.getCardNum());
+		payment.setId(param.getId());
 		service.payment(payment);
 		return retval;
 	}

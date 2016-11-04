@@ -12,5 +12,5 @@ import lombok.Setter;
 @Data
 public class PaymentDTO {
 	@Getter @Setter private int paymentSeq,rentSeq;
-	@Getter @Setter private String paymentDate,paymentAmt,paymentType,cardNum;
+	@Getter @Setter private String paymentDate,paymentAmt,paymentType,cardNum,id;
 }

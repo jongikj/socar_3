@@ -9,28 +9,40 @@
 		select count(*) as count from payment where ${keyField} = #{keyword}
 	</select>
 	<select id="list" resultType="com.socar.web.domains.PaymentDTO" parameterType="com.socar.web.domains.Command">
-      select 
-      	rent_seq rentSeq,
-      	payment_seq paymentSeq,
-      	payment_date paymentDate,
-      	payment_amt paymentAmt,
-      	payment_type paymentType,
-      	card_num cardNum
-      from payment 
+	  select t2.*
+	  from (select @ROWNUM := @ROWNUM + 1 AS seq
+	              ,p.rent_seq rentSeq
+	              ,p.payment_seq paymentSeq
+	              ,p.payment_date paymentDate
+	              ,p.payment_amt paymentAmt
+	              ,p.card_num cardNum
+	              ,p.id id
+  		    from   payment p
+		          ,(SELECT @ROWNUM := 0) R
+		    ORDER BY p.payment_seq desc
+	       ) t2
+	  where t2.seq between #{start} and #{end} and ${keyField} = #{keyword}
+	  order by t2.seq asc
 	</select>
- 	<select id="find" parameterType="com.socar.web.domains.Command" resultType="com.socar.web.domains.PaymentDTO">
-      select 
-       	rent_seq as rentSeq,
-      	payment_seq as paymentSeq,
-      	payment_date as paymentDate,
-      	payment_amt as paymentAmt,
-      	payment_type as paymentType,
-      	card_num as cardNum
-      from payment where ${keyField} = #{keyword}
-   </select>
+	<select id="find" resultType="com.socar.web.domains.PaymentDTO" parameterType="com.socar.web.domains.Command">
+	  select t2.*
+	  from (select @ROWNUM := @ROWNUM + 1 AS seq
+	              ,p.rent_seq rentSeq
+	              ,p.payment_seq paymentSeq
+	              ,p.payment_date paymentDate
+	              ,p.payment_amt paymentAmt
+	              ,p.card_num cardNum
+	              ,p.id id
+  		    from   payment p
+		          ,(SELECT @ROWNUM := 0) R
+		    ORDER BY p.payment_seq desc
+	       ) t2
+	  where t2.seq between #{start} and #{end} and ${keyField} = #{keyword}
+	  order by t2.seq asc
+	</select>
    <insert id="payment" parameterType="com.socar.web.domains.PaymentDTO">
-   		insert into payment(payment_date, payment_amt, rent_seq, card_num)
-   		values(#{paymentDate}, #{paymentAmt}, #{rentSeq}, #{cardNum})
+   		insert into payment(payment_date, payment_amt, rent_seq, card_num,id)
+   		values(#{paymentDate}, #{paymentAmt}, #{rentSeq}, #{cardNum},#{id})
    </insert>
 </mapper>
 

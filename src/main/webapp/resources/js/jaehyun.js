@@ -451,9 +451,9 @@ var member = (function(){
 						+'<!-- lnb -->'
 						+'<ul id="info_nav" class="info_lnb">'
 						+'<li><a onclick="member.mypage()" title="내 정보" class="info_lnb1">내 정보</a></li>'
-						+'<li><a onclick="member.history()" title="예약내역" class="info_lnb3">예약내역 <span>0</span></a></li>'
-						+'<li><a onclick="member.my_coupon()" title="내 쿠폰" class="info_lnb4">내 쿠폰 <span>2</span></a></li>'
-						+'<li><a onclick="member.my_pay()" title="결제내역" class="info_lnb5">결제내역</a></li>'
+						+'<li><a onclick="member.history()" title="예약내역" class="info_lnb3">예약내역 <span></span></a></li>'
+						+'<li><a onclick="member.my_coupon()" title="내 쿠폰" class="info_lnb4">내 쿠폰 <span></span></a></li>'
+						+'<li><a onclick="member.my_pay(1)" title="결제내역" class="info_lnb5">결제내역</a></li>'
 						+'</ul>'
 						+'<div class="section" style="float: left">'
 						+'<div class="group" style="width: 743px">'
@@ -544,10 +544,214 @@ var member = (function(){
 		
 		},
 		my_coupon: function(){
-			$('#pub_article').html(MYCOUPON_FORM);
-		},
-		my_pay : function(){
-			$('#pub_article').html(MYPAY_FORM);
+			$.getJSON(app.context() + "/member/session", function(session){
+				$.getJSON(app.context() + "/mycoupon/list/" +session.id, function(data){
+					var frame = '';
+					console.log('토탈 카운트' + data.totCount);
+					var MYCOUPON_FORM = 
+						'<div id="mypage" class="my_coupon box">'
+						+'<div id="container">'
+						+'<div id="content">'
+						+'<h2><img src="resources/img/mypage/h2.gif" alt="마이페이지 - 내 정보와 예약내역, 쿠폰 등을 확인할 수 있습니다." /></h2>'
+						+'<div class="info_lnb">'
+						+'<!-- lnb -->'
+						+'<ul id="info_nav" class="info_lnb">'
+						+'<li><a onclick="member.mypage()" title="내 정보" class="info_lnb1">내 정보</a></li>'
+						+'<li><a onclick="member.history()" title="예약내역" class="info_lnb3">예약내역 <span></span></a></li>'
+						+'<li><a onclick="member.my_coupon()" title="내 쿠폰" class="info_lnb4">내 쿠폰 <span></span></a></li>'
+						+'<li><a onclick="member.my_pay(1)" title="결제내역" class="info_lnb5">결제내역</a></li>'
+						+'</ul>'
+						+'<!-- //lnb -->'
+						+'<div class="my_coupon_section">'
+						+'<div style="width: 800px;" class="group">'
+						+'<h3><img src="resources/img/mypage/coupon_txt1.gif" alt="내 쿠폰" /><span>'+data.totCount+'</span> <img src="resources/img/mypage/coupon_txt2.gif" alt="개" /></h3>'
+						+'<p class="coupon-add">'
+						+'<a class="couponAddB">'
+						+'<img src="resources/img/mypage/btn_coupon.gif" alt="쿠폰 등록하기" />'
+						+'</a>'
+						+'</p>'
+						+'<div class="gbx">'
+						+'<ul style="list-style: circle;">'
+						+'<li>쿠폰은 <em>최초 대여요금에만 적용</em>됩니다. (보험료/주행요금/연장 대여요금에 적용 불가)</li>'
+						+'<li>쿠폰은 예약당 1개만 사용가능합니다. (중복적용 불가)</li>'
+						+'<li>주중전용 쿠폰은 주말 및 공휴일 사용이 불가능합니다.</li>'
+						+'<li>편도 예약시 편도 전용 쿠폰만 사용 가능하며, 편도요금에만 할인이 제공됩니다. (대여료 할인 불가)</li>'
+						+'<li>예약 취소시, 쿠폰은 유효기간 내에만 재발급됩니다.</li>'
+						+'<li>제주공항/제주공항교차로존은 전용쿠폰을 제외한 모든 쿠폰적용이 불가합니다.</li>'
+						+'<li class="tip"><em>[주말 기준]</em> 금요일 19:00 ~ 일요일 19:00</li>'
+						+'<li class="tip"><em>[공휴일 기준]</em> 해당일 00:00 ~ 24:00</li>'
+						+'</ul>'
+						+'</div>'
+						+'<table cellspacing="0" class="cols">'
+						+'<thead>'
+						+'<tr>'
+						+'<th>쿠폰</th>'
+						+'<th>유효기간</th>'
+						+'<th>상태</th>'
+						+'</tr>'
+						+'</thead>'
+						+'<tbody>';
+					frame += MYCOUPON_FORM;
+					if(data.totCount == 0){
+						frame += 
+							'<tr"><td colspan=3>보유하고 있는 쿠폰이 없습니다.</td></tr>';
+					} else {
+						var status = '';
+						$.each(data.list, function(i, coupon){
+							if(coupon.useFlag == 'Y'){
+								status = '사용불가';
+							} else {
+								status = '사용가능';
+							}
+							frame +=
+								 '<tr>'
+								+'<td class="info"style="text-align:left">'
+								+'<h4 class="coupon_usage" style="text-decoration:none;font-size:15px;font-weight:bold">'+coupon.couponName+'</h4>'
+								+'<div class="desc"style="color:gray">'+coupon.optionHeader+'</div><br>'
+								+'<ul class="list_info">'
+								+'<li style="width: 550px;">'+coupon.optionDetail+'</li>'
+								+'</ul>'
+								+'<td class="expire">'+coupon.openDateStart+' ~ '+coupon.openDateEnd+'</td>'
+								+'<td class="status">'+status+'</td>'
+								+'</tr>';
+							});
+					}
+					frame +=
+						'</tbody>'
+						+'</table>'
+						+'</div>'
+						+'<div style="padding-top:30px;">'
+						+'<a><img style="width: 100%;" src="resources/img/mypage/coupon_couponbook.gif" alt="쏘카의 다양한 쿠폰혜택 살펴보세요! 쏘카 쿠폰북 바로가기" /></a>'
+						+'</div></div></div></div></div></div>';
+					$('#pub_article').html(frame);
+				});
+			});
+		}, //마이쿠폰 끝
+		my_pay : function(pgNum){
+			$.getJSON(app.context() + '/member/session', function(session){
+				$.getJSON(app.context() + '/payment/find/id/' + session.id + '/' + pgNum, function(data){
+					var frame = '';
+					var startPg = data.startPg;
+					var lastPg = data.lastPg;
+					var pgSize = data.pgSize;
+					var totPg = data.totPg;
+					var groupSize = data.groupSize;
+					var totCount = data.totCount;
+					console.log('스타트 페이지' + startPg);
+					console.log('라스트 페이지' + lastPg);
+					console.log('페이지 사이즈' + pgSize);
+					console.log('토탈 페이지' + totPg);
+					console.log('그룹 사이즈' + groupSize);
+					console.log('페이지 넘버' + pgNum);
+					console.log('토탈 카운트' + totCount);
+					var MYPAY_FORM = 
+					'<div id="mypage" class="payment box"><div id="container">'
+					+'<div id="content">'
+					+'<h2><img src="resources/img/mypage/h2.gif" alt="[마이페이지] 내 정보와 예약내역, 쿠폰 등을 확인할 수 있습니다." /></h2>'
+					+'<div class="info_lnb">'
+					+'<!-- lnb -->'
+					+'<ul style="margin-bottom: 0px" id="info_nav" class="info_lnb">'
+					+'<li><a onclick="member.mypage()" title="내 정보" class="info_lnb1">내 정보</a></li>'
+					+'<li><a onclick="member.history()" title="예약내역" class="info_lnb3">예약내역 <span></span></a></li>'
+					+'<li><a onclick="member.my_coupon()" title="내 쿠폰" class="info_lnb4">내 쿠폰 <span></span></a></li>'
+					+'<li><a onclick="member.my_pay(1)" title="결제내역" class="info_lnb5">결제내역</a></li>'
+					+'</ul>'
+					+'<!-- //lnb -->'
+					+'<div style="margin-left: 85px" class="section">'
+					+'<div style="width: 100%;" class="group">'
+					+'<h3 class="tit_corp">'
+					+'<img src="resources/img/mypage/payment_txt1.gif" alt="결제내역" />'
+					+'</h3>'
+					+'<div style="width: 550px" class="gbx">'
+					+'<ul>'
+					+'<li>요금 결제 시 보유 크레딧이 있으면 크레딧으로 결제 후 부족 금액만 결제카드로 청구합니다.</li>'
+					+'<li>결제카드 변경은 내 정보 페이지에서 할 수 있습니다.'
+					+'</li>'
+					+'</ul>'
+					+'</div>'
+					+'<div class="my_pay_section">'
+					+'<div class="history_grdoup">'
+					+'<table style="width: 550px;" cellspacing="0" class="cols">'
+					+'<colgroup><col><col><col width="270"><col><col><col></colgroup>'
+					+'<thead>'
+					+'<tr>'
+					+'<th style="width: 70px;">결제일</th>'
+					+'<th>결제수단</th>'
+					+'<th>금액</th>'
+					+'</tr>'
+					+'</thead>'
+					+'<tbody>';
+					frame += MYPAY_FORM
+					if(totCount == 0){
+						frame += 
+							'<tr><td colspan=3>결제 내역이 없습니다.</td></tr>'
+					} else {
+						$.each(data.list, function(i, payment){
+							var split = payment.paymentDate.split('-');
+							frame +=
+								 '<tr>'
+								+'<td>'+split[0]+'-'+split[1]+'-'+split[2].substring(0,2)+'</td>'
+								+'<td class="method">신용카드</td>'
+								+'<td style="text-align: center;" class="price">'+payment.paymentAmt+'</td>'
+								+'</td>'
+								+'</tr>'
+						});
+					}
+					frame +=
+					'</tbody>'
+					+'</table>';
+					var pagination = 
+						 '<nav aria-label="Page navigation">'
+						+'<ul class="paginate">';
+					var temp_num;
+					if(pgNum > groupSize){
+						var temp;
+						if(pgNum % groupSize == 0){
+							temp = (Math.floor(((pgNum - groupSize) / groupSize)) * groupSize) + 1 - groupSize;
+						}else{
+							temp = (Math.floor(((pgNum - groupSize) / groupSize)) * groupSize) + 1;
+						}					
+						var temp2 = 1;
+						pagination +=
+							'<a onclick="member.my_pay(' + temp2 + ')" aria-label="Previous">'
+							+'<span style="font-size: 30px" aria-hidden="true">&laquo;</span>'
+							+'</a>'
+							+'<a onclick="member.my_pay(' + temp + ')" aria-label="Previous">'
+							+'<span aria-hidden="true"><</span>'
+							+'</a>';
+					}
+					for(var i=startPg; i < startPg+groupSize && i <= totPg; i++){
+						if(i == pgNum){
+							pagination += '<font color="blue"><strong>' + i + '</strong></font>';
+						} else {
+							pagination += '<a onclick="member.my_pay('+ i +')">' + ' ' + i + ' ' + '</a>';
+						}
+						temp_num = i;
+					}
+					if(temp_num != totPg){ //0~9
+						var temp3;
+						if(pgNum % groupSize == 0){
+							temp3 = (Math.floor(((pgNum + groupSize) / groupSize)) * groupSize) + 1 - groupSize;
+						}else{
+							temp3 = (Math.floor(((pgNum + groupSize) / groupSize)) * groupSize) + 1;
+						}
+						var temp4 = totPg;
+						pagination += 
+							'<a onclick="member.my_pay(' + temp3 + ')" aria-label="Next">'
+							+'<span aria-hidden="true">></span>'
+							+'</a>'
+							+'<a onclick="member.my_pay(' + temp4 + ')" aria-label="Next">'
+							+'<span style="font-size: 30px" aria-hidden="true">&raquo;</span>'
+							+'</a>';
+					}
+					pagination += '</ul></nav>';
+					frame += pagination;
+					frame += 
+						 '</div>'
+						+'</div></div></div></div></div></div></div>';
+					$('#pub_article').html(frame);
+				});//페이먼트 파인드
+			}); //멤버 세션
 		},
 		payment : function(rentSeq, price){
 			$.getJSON(app.context() + '/history/find/rent_seq/' + rentSeq + '/1', function(flag){
@@ -629,9 +833,9 @@ var MYINFO_FORM =
 +'<!-- lnb -->'
 +'<ul id="info_nav" class="info_lnb">'
 +'<li><a onclick="member.mypage()" title="내 정보" class="info_lnb1">내 정보</a></li>'
-+'<li><a onclick="member.history()" title="예약내역" class="info_lnb3">예약내역 <span>0</span></a></li>'
-+'<li><a onclick="member.my_coupon()" title="내 쿠폰" class="info_lnb4">내 쿠폰 <span>2</span></a></li>'
-+'<li><a onclick="member.my_pay()" title="결제내역" class="info_lnb5">결제내역</a></li>'
++'<li><a onclick="member.history()" title="예약내역" class="info_lnb3">예약내역 <span></span></a></li>'
++'<li><a onclick="member.my_coupon()" title="내 쿠폰" class="info_lnb4">내 쿠폰 <span></span></a></li>'
++'<li><a onclick="member.my_pay(1)" title="결제내역" class="info_lnb5">결제내역</a></li>'
 +'</ul>'
 +'<!-- //lnb -->'
 +'<div class="section wrap_join_bn">'
@@ -884,14 +1088,14 @@ var MYHISTORY_FORM =
 +'<!-- lnb -->'
 +'<ul id="info_nav" class="info_lnb">'
 +'<li><a onclick="member.mypage()" title="내 정보" class="info_lnb1">내 정보</a></li>'
-+'<li><a onclick="member.history()" title="예약내역" class="info_lnb3">예약내역 <span>0</span></a></li>'
-+'<li><a onclick="member.my_coupon()" title="내 쿠폰" class="info_lnb4">내 쿠폰 <span>2</span></a></li>'
-+'<li><a onclick="member.my_pay()" title="결제내역" class="info_lnb5">결제내역</a></li>'
++'<li><a onclick="member.history()" title="예약내역" class="info_lnb3">예약내역 <span></span></a></li>'
++'<li><a onclick="member.my_coupon()" title="내 쿠폰" class="info_lnb4">내 쿠폰 <span></span></a></li>'
++'<li><a onclick="member.my_pay(1)" title="결제내역" class="info_lnb5">결제내역</a></li>'
 +'</ul>'
 +'<div class="section" style="float: left">'
 +'<div class="group" style="width: 743px">'
 +'<h3 class="tit_corp">'
-+'<img src="resources/img/mypage/reservation_txt1.gif" alt="예약내역" /> <span>0</span> <img src="resources/img/mypage/reservation_txt2.gif" alt="건" />'
++'<img src="resources/img/mypage/reservation_txt1.gif" alt="예약내역" /> <span></span> <img src="resources/img/mypage/reservation_txt2.gif" alt="건" />'
 +'</h3>'
 +'<div class="gbx">'
 +'<ul>'
@@ -953,9 +1157,9 @@ var MYCOUPON_FORM =
 +'<!-- lnb -->'
 +'<ul id="info_nav" class="info_lnb">'
 +'<li><a onclick="member.mypage()" title="내 정보" class="info_lnb1">내 정보</a></li>'
-+'<li><a onclick="member.history()" title="예약내역" class="info_lnb3">예약내역 <span>0</span></a></li>'
-+'<li><a onclick="member.my_coupon()" title="내 쿠폰" class="info_lnb4">내 쿠폰 <span>2</span></a></li>'
-+'<li><a onclick="member.my_pay()" title="결제내역" class="info_lnb5">결제내역</a></li>'
++'<li><a onclick="member.history()" title="예약내역" class="info_lnb3">예약내역 <span></span></a></li>'
++'<li><a onclick="member.my_coupon()" title="내 쿠폰" class="info_lnb4">내 쿠폰 <span></span></a></li>'
++'<li><a onclick="member.my_pay(1)" title="결제내역" class="info_lnb5">결제내역</a></li>'
 +'</ul>'
 +'<!-- //lnb -->'
 +'<div class="my_coupon_section">'
@@ -1029,9 +1233,9 @@ var MYPAY_FORM =
 +'<!-- lnb -->'
 +'<ul style="margin-bottom: 0px" id="info_nav" class="info_lnb">'
 +'<li><a onclick="member.mypage()" title="내 정보" class="info_lnb1">내 정보</a></li>'
-+'<li><a onclick="member.history()" title="예약내역" class="info_lnb3">예약내역 <span>0</span></a></li>'
-+'<li><a onclick="member.my_coupon()" title="내 쿠폰" class="info_lnb4">내 쿠폰 <span>2</span></a></li>'
-+'<li><a onclick="member.my_pay()" title="결제내역" class="info_lnb5">결제내역</a></li>'
++'<li><a onclick="member.history()" title="예약내역" class="info_lnb3">예약내역 <span></span></a></li>'
++'<li><a onclick="member.my_coupon()" title="내 쿠폰" class="info_lnb4">내 쿠폰 <span></span></a></li>'
++'<li><a onclick="member.my_pay(1)" title="결제내역" class="info_lnb5">결제내역</a></li>'
 +'</ul>'
 +'<!-- //lnb -->'
 +'<div style="margin-left: 85px" class="section">'

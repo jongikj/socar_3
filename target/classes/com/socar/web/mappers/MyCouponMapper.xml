@@ -9,22 +9,21 @@
    	<select id="findCount" resultType="com.socar.web.domains.Retval" parameterType="com.socar.web.domains.Command">
    	  select count(*) as count from Coupon_member where ${keyField} = #{keyword}
    	</select>
-	<select id="list" resultType="com.socar.web.domains.MyCouponDTO" parameterType="com.socar.web.domains.Command">
-		select *
-		 from(
-		 select @NO := @NO + 1 as ROWNUM, A.*
-		 from
-		 (
-		 select
-		 cm.coupon_member_seq couponMemberSeq,
-		 cm.use_flag useFlag,
-		 cm.coupon_master_seq couponMasterSeq,
-		 cm.id id 
-		 from Coupon_member cm order by coupon_member_seq desc
-		 )A,
-		 (select @NO := 0)B
-		 )C
-	 	where C.ROWNUM BETWEEN ${start} and ${end};			
+	<select id="list" resultType="com.socar.web.domains.CouponMemberMasterDTO" parameterType="com.socar.web.domains.Command">
+     select
+		u.coupon_member_seq couponMemberSeq,
+		u.coupon_master_seq couponMasterSeq,
+		u.use_flag useFlag,
+		u.id id,
+		m.coupon_name couponName,
+		m.dc_option dcOption,
+		m.dc dc,
+		m.option_header optionHeader,
+		m.option_detail optionDetail,
+		m.open_date_start openDateStart,
+		m.open_date_end openDateEnd
+	from coupon_member u, coupon_master m
+	where u.coupon_master_seq = m.coupon_master_seq and id = #{keyword};		
 	</select>
 	<select id="find" resultType="com.socar.web.domains.MyCouponDTO" parameterType="com.socar.web.domains.Command">
 	     select *

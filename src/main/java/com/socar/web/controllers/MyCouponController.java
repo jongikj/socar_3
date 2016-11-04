@@ -36,24 +36,16 @@ public class MyCouponController {
 		return retval;
 	}
 	
-	@RequestMapping("/list/{pgNum}")
-	public @ResponseBody HashMap<String, Object> goList(@PathVariable String pgNum){
+	@RequestMapping("/list/{keyword}")
+	public @ResponseBody HashMap<String, Object> goList(@PathVariable String keyword){
 		logger.info("MyCounponContoller GO TO {}", "goList");
-		int[] rows = new int[2];
-		int[] pages = new int[3];
 		HashMap<String, Object> map = new HashMap<String, Object>();
-		retval = service.count();
+		command.setKeyField("id");
+		command.setKeyword(keyword);
+		retval = service.findCount(command);
 		int totCount = retval.getCount();
-        rows = Pagination.getRows(totCount, Integer.parseInt(pgNum), Values.PG_SIZE);
-        pages = Pagination.getPages(totCount, Integer.parseInt(pgNum));
-        command.setStart(rows[0]);
-        command.setEnd(rows[1]);
         map.put("list", service.list(command));
         map.put("totCount", totCount);
-        map.put("totPg", pages[2]);
-        map.put("pgNum", pgNum);
-        map.put("startPg", pages[0]);
-        map.put("lastPg", pages[1]);
 		return map;
 	}
 	
