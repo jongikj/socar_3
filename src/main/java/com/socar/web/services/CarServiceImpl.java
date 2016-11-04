@@ -40,4 +40,10 @@ public class CarServiceImpl implements CarService{
 		return mapper.list();
 	}
 
+	@Override
+	public CarDTO findOne(Command command) {
+		CarMapper mapper = sqlsession.getMapper(CarMapper.class);
+		return mapper.findOne(command);
+	}
+
 }

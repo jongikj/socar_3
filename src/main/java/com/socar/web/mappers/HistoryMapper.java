@@ -15,4 +15,6 @@ public interface HistoryMapper {
 	public List<HistoryDTO> list(Command command);
 	public List<HistoryDTO> find(Command command);
 	public int insert(HistoryDTO history);
+	public int notCouponInsert(HistoryDTO history);
+	public Retval useStatus(Command command);
 }

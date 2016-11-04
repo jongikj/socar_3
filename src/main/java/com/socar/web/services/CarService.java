@@ -16,4 +16,5 @@ public interface CarService {
 	public Retval findCount(Command command);
 	public List<CarDTO> find(Command command);
 	public List<CarDTO> list();
+	public CarDTO findOne(Command command);
 }

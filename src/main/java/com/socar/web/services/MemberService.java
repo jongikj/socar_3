@@ -12,14 +12,14 @@ import com.socar.web.domains.Retval;
 @Component
 @Lazy
 public interface MemberService {
-	public MemberDTO signIn(MemberDTO member);
-	// CREATE, UPDATE, DELETE
-	public String regist(MemberDTO param);
-	public Retval update(MemberDTO param);
-	public Retval delete(MemberDTO param);
-		// SELECT
-	public Retval count();
-	public List<MemberDTO> list();
-	public List<MemberDTO> find(Command command);
-	public int existId(String id);
+   public MemberDTO signIn(MemberDTO member);
+   // CREATE, UPDATE, DELETE
+   public String regist(MemberDTO param);
+   public String update(MemberDTO param);
+   public String delete(String id);
+      // SELECT
+   public Retval count();
+   public List<MemberDTO> list();
+   public List<MemberDTO> find(Command command);
+   public int existId(String id);
 }

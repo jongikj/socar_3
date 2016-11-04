@@ -10,23 +10,20 @@
    	  select count(*) as count from rent where ${keyField} = #{keyword}
    </select>
    <select id="list" resultType="com.socar.web.domains.HistoryDTO" parameterType="com.socar.web.domains.Command">
-     select *
-      from(
-      select @NO := @NO + 1 as ROWNUM, A.*
-      from
-      (
-      select 
-      r.rent_seq rentSeq,
-      r.start_date startDate,
-      r.end_date endDate,
-      r.milege milege,
-      r.car_seq carSeq,
-      r.coupon_member_seq couponMemberSeq
-      from rent r order by rent_seq desc
-      )A,
-      (select @NO := 0)B
-      )C
-      where C.ROWNUM BETWEEN ${start} and ${end};
+		select
+		c.car_type carType,
+		c.car_num carNum,
+		c.socar_zone socarZone,
+		c.rent_amt rentAmt,
+		c.car_img carImg,
+		r.id id,
+		r.start_date startDate,
+		r.end_date endDate,
+		r.rent_seq rentSeq,
+		r.price price,
+		r.status status
+		from rent r, car c
+		where r.car_seq = c.car_seq and id = #{keyword};
    </select>  
    <select id="find" resultType="com.socar.web.domains.HistoryDTO" parameterType="com.socar.web.domains.Command">
      select *
@@ -38,9 +35,9 @@
       r.rent_seq rentSeq,
       r.start_date startDate,
       r.end_date endDate,
-      r.milege milege,
       r.car_seq carSeq,
-      r.coupon_member_seq couponMemberSeq 
+      r.coupon_member_seq couponMemberSeq,
+      r.status status
       from rent r where ${keyField} = #{keyword} order by rent_seq desc
       )A,
       (select @NO := 0)B
@@ -48,7 +45,14 @@
       where C.ROWNUM BETWEEN #{start} and #{end};
    </select>
    <insert id="insert" parameterType="com.socar.web.domains.HistoryDTO">
-     insert into rent(start_date,end_date,milege,car_seq,coupon_member_seq,id)
-     values(#{start_date},#{end_date},#{milege},#{car_seq},#{coupon_member_seq},#{id})
+     insert into rent(start_date,end_date,car_seq,coupon_member_seq,id,price,status)
+     values(#{startDate},#{endDate},#{carSeq},#{couponMemberSeq},#{id},#{price},'N')
    </insert>
+      <insert id="notCouponInsert" parameterType="com.socar.web.domains.HistoryDTO">
+     insert into rent(start_date,end_date,car_seq,id, price, status)
+     values(#{startDate},#{endDate},#{carSeq},#{id}, #{price}, 'N')
+   </insert>
+   <select id="useStatus" parameterType="com.socar.web.domains.Command" resultType="com.socar.web.domains.Retval">
+  		update rent set status ='Y' where rent_seq = #{keyword}
+   </select>
 </mapper>

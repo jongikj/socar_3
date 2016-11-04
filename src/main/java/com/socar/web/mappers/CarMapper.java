@@ -2,7 +2,6 @@ package com.socar.web.mappers;
 
 import java.util.List;
 
-
 import org.springframework.stereotype.Repository;
 
 import com.socar.web.domains.CarDTO;
@@ -16,4 +15,5 @@ public interface CarMapper {
 		public List<CarDTO> find(Command command);
 		public List<CarDTO> list();
 		public List<String> listZone();
+		public CarDTO findOne(Command command);
 }

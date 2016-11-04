@@ -1,6 +1,8 @@
 package com.socar.web.controllers;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,13 +75,17 @@ public class CouponController {
          command.setKeyField(keyField);
          command.setKeyword(keyword);
          HashMap<String, Object> map = new HashMap<String, Object>();
+         List<CouponDTO> list = new ArrayList<CouponDTO>();
          Retval r = service.findCount(command);
          int totCount = r.getCount();   
          int[] pages = Pagination.getPages(totCount, Integer.parseInt(pgNum));
          int[] rows = Pagination.getRows(totCount,  Integer.parseInt(pgNum), Values.PG_SIZE);
          command.setStart(rows[0]);
          command.setEnd(rows[1]);
+         list = service.find(command);
          map.put("list", service.find(command));
+         map.put("dc", list.get(0).getDc());
+         map.put("dcOption", list.get(0).getDcOption());
          map.put("pgSize", Values.PG_SIZE);
          map.put("totCount", totCount);
          map.put("totPg", pages[2]);

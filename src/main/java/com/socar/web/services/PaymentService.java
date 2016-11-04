@@ -14,4 +14,5 @@ public interface PaymentService {
 	public List<PaymentDTO> list(Command command);
 	public Retval find_count(Command command);
 	public List<PaymentDTO> find(Command command);
+	public int payment(PaymentDTO payment);
 }

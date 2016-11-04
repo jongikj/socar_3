@@ -69,7 +69,15 @@ public class CarController {
 		logger.info("CarController GO TO {}", "list");
 		List<CarDTO> list = new ArrayList<CarDTO>();
 		list = service.list();
-		
 		return list;
+	}
+	
+	@RequestMapping("/findOne/{keyField}/{keyword}")
+	public @ResponseBody CarDTO findOne(@PathVariable String keyField, @PathVariable String keyword){
+		logger.info("CarController GO TO {}", "findOne");
+		command.setKeyField(keyField);
+		command.setKeyword(keyword);
+		car = service.findOne(command);
+		return car;
 	}
 }

@@ -8,9 +8,11 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import com.socar.web.domains.Command;
+import com.socar.web.domains.CouponDTO;
 import com.socar.web.domains.HistoryDTO;
 import com.socar.web.domains.Retval;
 import com.socar.web.mappers.CarMapper;
+import com.socar.web.mappers.CouponMapper;
 import com.socar.web.mappers.HistoryMapper;
 
 @Service
@@ -18,10 +20,6 @@ import com.socar.web.mappers.HistoryMapper;
 public class HistoryServiceImpl implements HistoryService{
 	@Autowired SqlSession sqlSession;
 	@Autowired Command command;
-	
-	
-	
-	
 	
 	@Override
 	public Retval count() {
@@ -50,6 +48,30 @@ public class HistoryServiceImpl implements HistoryService{
 	public List<String> getListZone() {
 		CarMapper mapper = sqlSession.getMapper(CarMapper.class);
 		return mapper.listZone();
+	}
+
+	@Override
+	public List<CouponDTO> getListCoupon() {
+		CouponMapper mapper = sqlSession.getMapper(CouponMapper.class);
+		return mapper.list();
+	}
+
+	@Override
+	public int insert(HistoryDTO history) {
+		HistoryMapper mapper = sqlSession.getMapper(HistoryMapper.class);
+		return mapper.insert(history);
+	}
+
+	@Override
+	public int notCouponInsert(HistoryDTO history) {
+		HistoryMapper mapper = sqlSession.getMapper(HistoryMapper.class);
+		return mapper.notCouponInsert(history);
+	}
+
+	@Override
+	public Retval useStatus(Command command) {
+		HistoryMapper mapper = sqlSession.getMapper(HistoryMapper.class);
+		return mapper.useStatus(command);
 	}
 	
 }

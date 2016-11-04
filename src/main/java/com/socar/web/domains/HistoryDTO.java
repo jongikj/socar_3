@@ -11,6 +11,6 @@ import lombok.Setter;
 @Lazy
 @Data
 public class HistoryDTO {
-	@Getter @Setter int rentSeq, milege, couponMemberSeq;
-	@Getter @Setter String startDate, endDate, carNum;
+	@Getter @Setter int rentSeq, couponMemberSeq, carSeq, price, rentAmt;
+	@Getter @Setter String startDate, endDate, id, socarZone, carNum, carType, carImg, status;
 }

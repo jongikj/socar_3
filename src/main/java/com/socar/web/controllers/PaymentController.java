@@ -1,5 +1,7 @@
 package com.socar.web.controllers;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 
 import org.slf4j.Logger;
@@ -8,7 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
@@ -85,5 +89,18 @@ public class PaymentController {
 		map.put("lastPg", pages[1]);
 		map.put("groupSize", Values.GROUP_SIZE);
 		return map;
+	}
+	
+	@RequestMapping(value="/pay", method=RequestMethod.POST)
+	public @ResponseBody Retval goPay(@RequestBody PaymentDTO param){
+		logger.info("PaymentController {}", "goPay");
+		Date date = new Date();	
+		SimpleDateFormat s = new SimpleDateFormat("yyyy-MM-dd");
+		payment.setPaymentDate(s.format(date));
+		payment.setPaymentAmt(param.getPaymentAmt());
+		payment.setRentSeq(param.getRentSeq());
+		payment.setCardNum(param.getCardNum());
+		service.payment(payment);
+		return retval;
 	}
 }

@@ -10,6 +10,7 @@ import lombok.Setter;
 @Component
 @Lazy
 @Data
-public class BookingDTO {
-   @Getter @Setter String startDate, endDate, input_location;
+public class CouponMemberMasterDTO {
+	@Getter @Setter int couponMemberSeq, couponMasterSeq, dc, carSeq, price;
+	@Getter @Setter String useFlag, id, couponName, dcOption, startDate, endDate; 
 }

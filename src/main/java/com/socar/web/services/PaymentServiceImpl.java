@@ -44,4 +44,9 @@ public class PaymentServiceImpl implements PaymentService{
 		PaymentMapper mapper = sqlSession.getMapper(PaymentMapper.class);
 		return mapper.find(command);
 	}
+	@Override
+	public int payment(PaymentDTO payment) {
+		PaymentMapper mapper = sqlSession.getMapper(PaymentMapper.class);
+		return mapper.payment(payment);
+	}
 }

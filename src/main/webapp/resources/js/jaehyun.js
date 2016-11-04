@@ -135,6 +135,71 @@ var member = (function(){
 						});
 						
 					});
+					$('#cardinfo_reg_button').click(function() {
+						alert("ready4");
+						var card_info = {
+								cardNum : $('#my_card_num1').val() + '-' + $('#my_card_num2').val() + '-' + $('#my_card_num3').val() + '-' + $('#my_card_num4').val(),
+								cardYear : $('#my_card_year').val(),
+								cardMonth : $('#my_card_month').val(),
+								cardPw : $('#my_card_pw').val(),
+								businessNum : $('#myinfo_business_num1').val()+'-'+$('#myinfo_business_num2').val()+'-'+$('#myinfo_business_num3').val(),
+								id : data.id
+						}
+						if($('#mypage_card_change').text() === '등록하기'){
+							//insert 
+							
+							$.ajax({
+								url : app.context() + '/card/cardRegist',
+								type : 'post',
+								contentType : 'application/json',
+								data : JSON.stringify(card_info),
+								dataType : 'json',
+								success : function(insert){
+									alert("카드등록이 완료되었습니다.");
+									$('#mypage_card_num').text(card_info.cardNum);
+									$('#mypage_card_change').text("변경하기");
+								},
+								error : function(m) {
+									alert('카드 등록 중 에러 발생' + m);
+								}
+							});
+						}else{
+							$.ajax({
+								url : app.context() + '/card/cardUpdate',
+								type : 'post',
+								contentType : 'application/json',
+								data : JSON.stringify(card_info),
+								dataType : 'json',
+								success : function(insert){
+									alert("카드변경이 완료되었습니다.");
+									$('#mypage_card_num').text(card_info.cardNum);
+									$('#mypage_card_change').empty().text("변경완료").css('color', 'blue').css('margin-left','20px');
+/*									text("변경완료").css('color', 'red');
+									'<a id="mypage_card_change" class="card_del btn_del" data-toggle="modal" data-target="#myModal">변경하기</a>'
+*/								},
+								error : function(m) {
+									alert('카드 등록 중 에러 발생' + m);
+								}
+							});
+						}
+					});
+					////////회원탈퇴 시작
+					
+					$('#btn_user_drop').click(function(e) {
+						e.preventDefault();
+						alert("회원 탈퇴 후에는 3개월간 재가입이 불가능하며쿠폰/크레딧도 모두 소멸 됩니다 탈퇴를 신청하시겠어요??");
+						$.ajax({
+							url : app.context() + '/member/unregist',
+							type : 'post',
+							success : function(data){
+								alert("그동안 이용해주셔서 감사합니다")
+								location.href = app.context()+'/';
+							},
+							error : function(x,s,m) {
+								alert("회원탈퇴시 에러 발생"+m)
+							}
+						});
+					});
 					
 					
 					}
@@ -142,10 +207,6 @@ var member = (function(){
 						if(cardData.cardNum == null){
 							$('#mypage_card_num').text("카드를 등록해주세요.");
 							$('#mypage_card_change').text("등록하기");
-							
-							
-							
-							
 						} else {
 							$('#mypage_card_num').text(cardData.cardNum);
 						}
@@ -162,6 +223,7 @@ var member = (function(){
 					   } 
 					});	// 마이페이지 카드폼 개인, 법인 변경 끝
 				});
+				
 		},	//mypage 끝
 		regist : function(){
 			var temp = 0;
@@ -378,13 +440,148 @@ var member = (function(){
 			});
 		},	//regist의 끝
 		history : function(){
-			$('#pub_article').html(MYHISTORY_FORM);
+			$.getJSON(app.context() + '/member/session', function(session) {
+				$.getJSON(app.context() + '/history/list/' + session.id, function(data){
+					var MYHISTORY_FORM = 
+						'<div id="mypage" class="reservation box">'
+						+'<div id="container">'
+						+'<div id="content">'
+						+'<h2><img src="resources/img/mypage/h2.gif" alt="[마이페이지] 내 정보와 예약내역, 쿠폰 등을 확인할 수 있습니다." /></h2>'
+						+'<div class="info_lnb">'
+						+'<!-- lnb -->'
+						+'<ul id="info_nav" class="info_lnb">'
+						+'<li><a onclick="member.mypage()" title="내 정보" class="info_lnb1">내 정보</a></li>'
+						+'<li><a onclick="member.history()" title="예약내역" class="info_lnb3">예약내역 <span>0</span></a></li>'
+						+'<li><a onclick="member.my_coupon()" title="내 쿠폰" class="info_lnb4">내 쿠폰 <span>2</span></a></li>'
+						+'<li><a onclick="member.my_pay()" title="결제내역" class="info_lnb5">결제내역</a></li>'
+						+'</ul>'
+						+'<div class="section" style="float: left">'
+						+'<div class="group" style="width: 743px">'
+						+'<h3 class="tit_corp">'
+						+'<img src="resources/img/mypage/reservation_txt1.gif" alt="예약내역" /> <span>'+data.totCount+'</span> <img src="resources/img/mypage/reservation_txt2.gif" alt="건" />'
+						+'</h3>'
+						+'<div class="gbx">'
+						+'<ul>'
+						+'<li>예약변경은 반납연장만 가능합니다. 대여기간 수정, 지역 및 차종 변경은 취소 후 새로 예약해주세요.</li>'
+						+'<li>반납연장은 반납 예정 시각 30분 이전까지만 가능하며, 다른 회원의 예약이 이미 존재하는 경우에는 반납연장이 불가합니다.</li>'
+						+'<li>예약취소 시 대여요금과 보험료의 각 10%에 해당하는 수수료가 부과될 수 있습니다.</li>'
+						+'</ul>'
+						+'</div>'; // 예약 머리 끝
+						if(data.totCount == 0){
+							MYHISTORY_FORM +=
+								 '<div class="result_none">'
+								+'<p>예약내역이 없습니다.</p>'
+								+'</div>';
+						} else {
+							MYHISTORY_FORM +=
+								'<table cellspacing="0" class="cols">'
+								+'<thead>'
+								+'<tr>'
+								+'<th>예약번호</th>'
+								+'<th colspan="2">예약</th>'
+								+'<th>총 요금</th>'
+								+'<th>결제상태</th>'
+								+'<th>결제</th>'
+								+'</tr>'
+								+'</thead>'
+								+'<tbody>';
+							$.each(data.list, function(i, history){
+								var start = history.startDate.split('-');
+								var end = history.endDate.split('-');
+								var start2 = 0;
+								var end2 = 0;
+								var show_start = start[0] + '-' + start[1] + '-' + start[2].substring(0,2);
+								var show_end = end[0] + '-' + end[1] + '-' + end[2].substring(0,2);
+								start2 = start[2].substring(0,2)
+								end2 = end[2].substring(0,2);
+								var total_date = (start2 - end2) * -1;
+								var status = '';
+								if(history.status == 'N'){
+									status = '결제가능';
+								} else {
+									status = '결제완료';
+								}
+								MYHISTORY_FORM +=
+									 '<tr>'
+									+'<td>'+history.rentSeq+'</td>'
+									+'<td>'
+									+'<p class="thumb">'
+									+'<em class="car_id" style="display:none;">4325</em>'
+									+'<a class="carDetail">'
+									+'<img src="'+app.img()+'/booking/'+history.carImg+'">'
+									+'</a>'
+									+'</p>'
+									+'</td>'
+									+'<td class="info">'
+									+'<h4>'
+									+'<a class="carDetail">'+history.carType+'</a> '+history.carNum+''
+									+'</h4>'
+									+'<div class="desc">'
+									+''+show_start+' ~ '+show_end+' <br>'
+									+'총 '+ total_date +'일<br>'
+									+'<a class="socarzoneDetail">'+history.socarZone+'</a>'
+									+'</div>'
+									+'</td>'
+									+'<td style="text-align: center;" class="price">'
+									+'<a class="btn_payment_detail" >'+history.price+'원</a>'
+									+'</td>'
+									+'<td style="text-align: center;" class="status">'
+									+'<a class="btn_payment_status'+history.rentSeq+' status" >'+status+'</a>'
+									+'</td>'
+									+'<td>'
+									+'<a id="btn_payment" class="btnS rvExtendB"><span onclick="member.payment('+history.rentSeq+','+history.price+')">결제</span></a>'
+									+'</td>'
+									+'</tr>'
+								});
+							MYHISTORY_FORM +=
+								 '</tbody>'
+								+'</table>'
+								+'</div>';
+					}
+						$('#pub_article').html(MYHISTORY_FORM);
+				});
+			});
+		
 		},
 		my_coupon: function(){
 			$('#pub_article').html(MYCOUPON_FORM);
 		},
 		my_pay : function(){
 			$('#pub_article').html(MYPAY_FORM);
+		},
+		payment : function(rentSeq, price){
+			$.getJSON(app.context() + '/history/find/rent_seq/' + rentSeq + '/1', function(flag){
+				if(flag.status == 'Y'){
+					alert("이미 결제된 내역입니다.");
+				} else {
+					$.getJSON(app.context() + '/member/session', function(session){
+						$.getJSON(app.context() + '/card/find/id/' + session.id, function(card){
+							var pay_info = {
+									rentSeq : rentSeq,
+									paymentAmt : price,
+									id : session.id,
+									cardNum : card.cardNum
+							};
+							$.ajax({
+								url : app.context() + '/payment/pay',
+								type : 'POST',
+								data : JSON.stringify(pay_info),
+								dataType : 'JSON',
+								contentType : 'application/json',
+								success : function(data) {
+									$.getJSON(app.context() + '/history/useStatus/' + rentSeq, function(status) {
+										alert('결제가 완료되었습니다.');
+										$('.btn_payment_status'+rentSeq+'').text("결제완료").css('color', 'blue');
+									});
+								},
+								error : function(x, s, m) {
+									alert("예약중 오류 발생" + m);
+								}
+							});
+						});
+					});
+				}
+			});
 		}
 	};	
 })();
@@ -560,7 +757,7 @@ var MYINFO_FORM =
 +'<div class="box_radio">'
 +'<label for="radio0" class="default"><span id="mypage_card_num"></span></label>'
 +'</div>'
-+'<a id="mypage_card_change" class="card_del btn_del" data-toggle="modal" data-target="#myModal">변경하기</a>'
++'<div><a id="mypage_card_change" class="card_del btn_del" data-toggle="modal" data-target="#myModal">변경하기</a></div>'
 +'</li>'
 +'</ul>'
 +'<input type="hidden" name="card_count" id="card_count" value="1" />'
@@ -578,7 +775,7 @@ var MYINFO_FORM =
 +'<li>탈퇴 후 3개월간 재가입이 불가능하며, 쿠폰/크레딧도 소멸됩니다.</li>'
 +'</ul></div>'
 +'<p class="centerBtn">'
-+'<a id="btn_user_drop" class=""><img src="resources/img/mypage/btn_leave.gif" alt="탈퇴하기" /></a>'
++'<img id="btn_user_drop" class="cursor_pointer" src="resources/img/mypage/btn_leave.gif" alt="탈퇴하기" />'
 +'</p></div></div></div></div></div></div>'
 +'<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">'
 +'<div class="modal-dialog" role="document">'
@@ -603,56 +800,55 @@ var MYINFO_FORM =
 +'<tr>'
 +'<th>카드번호</th>'
 +'<td>'
-+'<input id="license_num1" maxlength="4" type="text" class="input" style="width:40px" value="" />'
++'<input id="my_card_num1" maxlength="4" type="text" class="input" style="width:40px" value="" />'
 +'<span>-</span>'
-+'<input id="license_num2" maxlength="4" type="text" class="input" style="width:40px" value="" />'
++'<input id="my_card_num2" maxlength="4" type="text" class="input" style="width:40px" value="" />'
 +'<span>-</span>'
-+'<input id="license_num3" maxlength="4" type="text" class="input" style="width:40px" value="" />'
++'<input id="my_card_num3" maxlength="4" type="text" class="input" style="width:40px" value="" />'
 +'<span>-</span>'
-+'<input id="license_num4" maxlength="4" type="text" class="input" style="width:40px" value="" />'
++'<input id="my_card_num4" maxlength="4" type="text" class="input" style="width:40px" value="" />'
 +'</td>'
 +'</tr>'
 +'<tr>'
 +'<th>유효기간</th>'
 +'<td>'
-+'<select id="license_loc" style="width:100px">'
-+'<option selected="selected" value="2016년">2016년</option>'
-+'<option value="2017년">2017년</option>'
-+'<option value="2018년">2018년</option>'
-+'<option value="2019년">2019년</option>'
-+'<option value="2020년">2020년</option>'
-+'<option value="2021년">2021년</option>'
-+'<option value="2022년">2022년</option>'
-+'<option value="2023년">2023년</option>'
-+'<option value="2024년">2024년</option>'
-+'<option value="2025년">2025년</option>'
-+'<option value="2026년">2026년</option>'
-+'<option value="2027년">2027년</option>'
-+'<option value="2028년">2028년</option>'
-+'<option value="2029년">2029년</option>'
-+'<option value="2030년">2030년</option>'
++'<select id="my_card_year" style="width:100px">'
++'<option selected="selected" value="2016">2016년</option>'
++'<option value="2017">2017년</option>'
++'<option value="2018">2018년</option>'
++'<option value="2019">2019년</option>'
++'<option value="2020">2020년</option>'
++'<option value="2021">2021년</option>'
++'<option value="2022">2022년</option>'
++'<option value="2023">2023년</option>'
++'<option value="2024">2024년</option>'
++'<option value="2025">2025년</option>'
++'<option value="2026">2026년</option>'
++'<option value="2027">2027년</option>'
++'<option value="2028">2028년</option>'
++'<option value="2029">2029년</option>'
++'<option value="2030">2030년</option>'
 +'</select>'
-+'<select id="license_loc" style="width:70px">'
-+'<option selected="selected" value="1월">1월</option>'
-+'<option value="2월">2월</option>'
-+'<option value="3월">3월</option>'
-+'<option value="4월">4월</option>'
-+'<option value="5월">5월</option>'
-+'<option value="6월">6월</option>'
-+'<option value="7월">7월</option>'
-+'<option value="8월">8월</option>'
-+'<option value="9월">9월</option>'
-+'<option value="10월">10월</option>'
-+'<option value="11월">11월</option>'
-+'<option value="12월">12월</option>'
++'<select id="my_card_month" style="width:70px">'
++'<option selected="selected" value="1">1월</option>'
++'<option value="2">2월</option>'
++'<option value="3">3월</option>'
++'<option value="4">4월</option>'
++'<option value="5">5월</option>'
++'<option value="6">6월</option>'
++'<option value="7">7월</option>'
++'<option value="8">8월</option>'
++'<option value="9">9월</option>'
++'<option value="10">10월</option>'
++'<option value="11">11월</option>'
++'<option value="12">12월</option>'
 +'</select>'
 +'</td>'
 +'</tr>'
 +'<tr id="show_p2">'
 +'<th>비밀번호</th>'
 +'<td>'
-+'<input placeholder="앞2자리" id="license_num1" maxlength="2" type="text" class="input" style="width:60px" value="" />'
-+'<span>**</span>'
++'<input placeholder="4자리" id="my_card_pw" maxlength="4" type="text" class="input" style="width:60px" value="" />'
 +'</td>'
 +'</tr>'
 +'<tr id="show_b">'
@@ -706,10 +902,47 @@ var MYHISTORY_FORM =
 +'</div>'
 +'<div class="result_none">'
 +'<p>예약내역이 없습니다.</p>'
-+'</div></div>'
-+'<!-- paginate -->'
-+'<div class="paginate">'
-+'</div><!-- //paginate --></div></div></div></div></div>';
++'</div>'
++'<table cellspacing="0" class="cols">'
++'<thead>'
++'<tr>'
++'<th colspan="2">예약</th>'
++'<th>총 요금</th>'
++'<th>결제</th>'
++'</tr>'
++'</thead>'
++'<tbody>'
++'<tr>'
++'<td>'
++'<p class="thumb">'
++'<em class="car_id" style="display:none;">4325</em>'
++'<a class="carDetail">'
++'<img src="/template/asset/images/car_image/car22.png">'
++'</a>'
++'</p>'
++'</td>'
++'<td class="info">'
++'<h4>'
++'<em id="6547083_car_id" class="car_id" style="display:none;">4325</em>'
++'<a href="#" class="carDetail">아반떼AD</a> (29호4179)'
++'</h4>'
++'<div class="desc">'
++'2016.11.04 금 12:30 - 2016.11.04 금 16:10 <br>'
++'총 3시간 40분 <br>'
++'<em id="6547083_zone_id" style="display:none;">2211</em>'
++'<a href="#" class="socarzoneDetail">수택동사거리</a>'
++'</div>'
++'</td>'
++'<td class="price">'
++'<a class="btn_payment_detail" >22,510원</a>'
++'</td>'
++'<td>'
++'<a id="btn_payment" class="btnS rvExtendB" ><span>결제</span></a>'
++'</td>'
++'</tr>'
++'</tbody>'
++'</table>'
++'</div>';
 
 var MYCOUPON_FORM = 
 '<div id="mypage" class="my_coupon box">'

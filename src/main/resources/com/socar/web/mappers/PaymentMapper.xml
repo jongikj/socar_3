@@ -17,8 +17,8 @@
       	payment_type paymentType,
       	card_num cardNum
       from payment 
-</select>
- <select id="find" parameterType="com.socar.web.domains.Command" resultType="com.socar.web.domains.PaymentDTO">
+	</select>
+ 	<select id="find" parameterType="com.socar.web.domains.Command" resultType="com.socar.web.domains.PaymentDTO">
       select 
        	rent_seq as rentSeq,
       	payment_seq as paymentSeq,
@@ -28,5 +28,9 @@
       	card_num as cardNum
       from payment where ${keyField} = #{keyword}
    </select>
+   <insert id="payment" parameterType="com.socar.web.domains.PaymentDTO">
+   		insert into payment(payment_date, payment_amt, rent_seq, card_num)
+   		values(#{paymentDate}, #{paymentAmt}, #{rentSeq}, #{cardNum})
+   </insert>
 </mapper>
 

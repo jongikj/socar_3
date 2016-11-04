@@ -1,6 +1,5 @@
 package com.socar.web.controllers;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +19,8 @@ import com.socar.web.constants.Values;
 import com.socar.web.domains.BookingDTO;
 import com.socar.web.domains.CarDTO;
 import com.socar.web.domains.Command;
+import com.socar.web.domains.CouponMemberMasterDTO;
+import com.socar.web.domains.HistoryDTO;
 import com.socar.web.domains.Retval;
 import com.socar.web.services.CarService;
 import com.socar.web.services.HistoryServiceImpl;
@@ -35,6 +36,8 @@ public class HistoryController {
 	@Autowired HistoryServiceImpl service;
 	@Autowired CarDTO car;
 	@Autowired CarService cService;
+	@Autowired CouponMemberMasterDTO cmm;
+	@Autowired HistoryDTO history;
 	
 	@RequestMapping("/content")
 	public @ResponseBody Map<String, Object> goContent(){
@@ -44,7 +47,14 @@ public class HistoryController {
 		map.put("list", listZone);
 		return map;
 	}
-	
+	@RequestMapping("/confirm")
+	public @ResponseBody Map<String, Object> goConfirm(){
+		logger.info("HistoryController GO To {}","confirm");
+		List<?> listCoupon = service.getListCoupon();
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("couponList", listCoupon);
+		return map;
+	}
 	
 	@RequestMapping("/count")
 	public @ResponseBody Retval count(){
@@ -53,9 +63,28 @@ public class HistoryController {
 		return retval;
 	}
 	
-	@RequestMapping("/reserve")
-	public @ResponseBody Retval goReserve(){
-		logger.info("BookingController GO TO {}", "reserve");
+	@RequestMapping(value="/reserve",method=RequestMethod.POST)
+	public @ResponseBody Retval goReserve(@RequestBody CouponMemberMasterDTO param){
+		logger.info("HistoryController GO TO {}", "reserve");
+		history.setStartDate(param.getStartDate());
+		history.setEndDate(param.getEndDate());
+		history.setCarSeq(param.getCarSeq());
+		history.setCouponMemberSeq(param.getCouponMemberSeq());
+		history.setId(param.getId());
+		history.setPrice(param.getPrice());
+		service.insert(history);
+		return retval;
+	}
+	
+	@RequestMapping(value="/notCouponInsert",method=RequestMethod.POST)
+	public @ResponseBody Retval goNotCouponInsert(@RequestBody CouponMemberMasterDTO param){
+		logger.info("HistoryController GO TO {}", "goNotCouponInsert");
+		history.setStartDate(param.getStartDate());
+		history.setEndDate(param.getEndDate());
+		history.setCarSeq(param.getCarSeq());
+		history.setId(param.getId());
+		history.setPrice(param.getPrice());
+		service.notCouponInsert(history);
 		return retval;
 	}
 	
@@ -65,27 +94,17 @@ public class HistoryController {
 		return retval;
 	}
 	
-	@RequestMapping("/list/{pgNum}")
-	public @ResponseBody HashMap<String, Object> list(@PathVariable int pgNum){
+	@RequestMapping("/list/{keyword}")
+	public @ResponseBody HashMap<String, Object> list(@PathVariable String keyword){
 		logger.info("History Controller GO TO {}", "list");
-		int[] rows = new int[2];
-		int[] pages = new int[3];
         HashMap<String, Object> map = new HashMap<String, Object>();
-        retval = service.count();
+        command.setKeyField("id");
+        command.setKeyword(keyword);
+        retval = service.findCount(command);
         int totCount = retval.getCount();
-        logger.info("LIST totCount {}", totCount);
-        rows = Pagination.getRows(totCount, pgNum, Values.PG_SIZE);
-        pages = Pagination.getPages(totCount, pgNum);
-        command.setStart(rows[0]);
-        command.setEnd(rows[1]);
+        logger.info("totCount {} ", totCount);
         map.put("list", service.list(command));
-        map.put("pgSize", Values.PG_SIZE);
         map.put("totCount", totCount);
-        map.put("totPg", pages[2]);
-        map.put("pgNum", pgNum);
-        map.put("startPg", pages[0]);
-        map.put("lastPg", pages[1]);
-        map.put("groupSize", Values.GROUP_SIZE);
 		return map;
 	}
 	
@@ -106,7 +125,9 @@ public class HistoryController {
          int[] rows = Pagination.getRows(totCount, Integer.parseInt(pgNum), Values.PG_SIZE);
          command.setStart(rows[0]);
          command.setEnd(rows[1]);
-         map.put("list", service.find(command));
+         List<HistoryDTO> list = service.find(command);
+         map.put("list", list);
+         map.put("status", list.get(0).getStatus());
          map.put("pgSize", Values.PG_SIZE);
          map.put("totCount", totCount);
          map.put("totPg", pages[2]);
@@ -121,9 +142,17 @@ public class HistoryController {
 		logger.info("BookingController GO TO {}", "select_date");
 		logger.info(param.getStartDate());
 		logger.info(param.getEndDate());
+		logger.info(param.getInput_location());
 		logger.info("CarController GO TO {}", "list");
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("carList", cService.list());
 		return map;
+	}
+	
+	@RequestMapping("/useStatus/{keyword}")
+	public @ResponseBody Retval useStauts(@PathVariable String keyword){
+		command.setKeyword(keyword);
+		service.useStatus(command);
+		return retval;
 	}
 }

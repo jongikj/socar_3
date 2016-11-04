@@ -48,4 +48,17 @@
       )C
       where C.ROWNUM BETWEEN #{start} and #{end};
    </select>
+   <select id="findOne" resultType="com.socar.web.domains.CarDTO" parameterType="com.socar.web.domains.Command">
+   		select 
+	      car_seq carSeq,
+	      rent_amt rentAmt,
+	      drive_amt driveAmt,
+	      car_num carNum,
+	      car_type carType,
+	      oil_type oilType,
+	      car_option carOption,
+	      socar_zone socarZone,
+	      car_img carImg
+		from Car where ${keyField} = #{keyword}
+   </select>
 </mapper>

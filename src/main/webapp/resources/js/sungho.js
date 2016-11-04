@@ -1187,6 +1187,7 @@ var customer = (function(){
 			$.getJSON(app.context() + '/member/session', function(session){
 				if(session.id == null){
 					alert("로그인을 해주세요");
+					member.pub_signin();
 				}else{
 			$('#pub_article').empty().html(CUSTOMER_INQUIRY_FORM);
 			customer.init();

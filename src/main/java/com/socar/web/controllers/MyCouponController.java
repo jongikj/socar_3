@@ -1,6 +1,8 @@
 package com.socar.web.controllers;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.socar.web.constants.Values;
 import com.socar.web.domains.Command;
+import com.socar.web.domains.MyCouponDTO;
 import com.socar.web.domains.Retval;
 import com.socar.web.services.MyCouponServiceImpl;
 import com.socar.web.util.Pagination;
@@ -80,5 +83,21 @@ public class MyCouponController {
         map.put("lastPg", pages[1]);
         map.put("groupSize", Values.GROUP_SIZE);
 		return map;
+	}
+	
+	@RequestMapping("/notUsedList/{keyword}")
+	public @ResponseBody HashMap<String, Object> notUsedList(@PathVariable String keyword){
+		command.setKeyword(keyword);
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		map.put("list", service.notUsedList(command));
+		return map;
+	}
+	
+	@RequestMapping("/useFlag/{keyword}")
+	public @ResponseBody Retval useFlag(@PathVariable String keyword){
+		command.setKeyword(keyword);
+		service.useFlag(command);
+		retval.setMessage("update success");
+		return retval;
 	}
 }
